@@ -1,24 +1,20 @@
-// ===== SUPABASE CONFIGURATION =====
-const SUPABASE_URL = 'https://vmctxpfqlwqhcdwiqkpg.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_DKgc7fLhpguRjq_xac86hw_F7MzhEjm';
+// ===== FIREBASE CONFIGURATION =====
+// Replace with YOUR Firebase config from Firebase Console
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// ===== DATABASE SCHEMA CONFIGURATION =====
-const TABLE_NAME = 'guest_houses';
-// Expected table structure:
-// - id (UUID, Primary Key)
-// - name (VARCHAR)
-// - location (VARCHAR)
-// - price (INTEGER)
-// - stars (DECIMAL/NUMERIC)
-// - whatsapp (VARCHAR) - Format: "255712345678" (country code + number, no + symbol)
-// - images (JSONB - Array of image URLs: ["url1", "url2", "url3"])
-// - amenities (JSONB - Array of amenity names: ["wifi", "pool", "ac", "parking"])
-// - views_count (INTEGER, default 0)
-// - clicks_count (INTEGER, default 0)
-// - created_at (TIMESTAMP)
+// ===== DATABASE COLLECTION NAME =====
+const COLLECTION_NAME = 'guest_houses';
 
 // ===== STATE MANAGEMENT =====
 let allProperties = [];
@@ -60,31 +56,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 });
 
-// ===== FETCH PROPERTIES FROM SUPABASE =====
+// ===== FETCH PROPERTIES FROM FIRESTORE =====
 async function loadProperties() {
     try {
         showLoadingSpinner(true);
         
-        const { data, error } = await supabase
-            .from(TABLE_NAME)
-            .select('*');
+        const querySnapshot = await db.collection(COLLECTION_NAME).get();
 
-        if (error) {
-            console.error('Error loading properties:', error);
+        if (querySnapshot.empty) {
+            console.warn('No properties found in Firestore');
             showEmptyState(true);
             return;
         }
 
-        if (!data || data.length === 0) {
-            showEmptyState(true);
-            return;
-        }
+        // Convert Firestore documents to array
+        allProperties = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-        allProperties = data;
         filteredProperties = [...allProperties];
         renderProperties();
     } catch (error) {
-        console.error('Unexpected error:', error);
+        console.error('Error loading properties:', error);
         showEmptyState(true);
     } finally {
         showLoadingSpinner(false);
@@ -290,7 +284,6 @@ async function handleBookNowClick(event) {
     );
 
     // Format WhatsApp link
-    // For international numbers: https://wa.me/{countrycode}{phonenumber}
     const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
 
     // Open WhatsApp in new window
@@ -305,15 +298,10 @@ async function incrementViewsCount(propertyId) {
 
         const newViewsCount = (property.views_count || 0) + 1;
 
-        const { error } = await supabase
-            .from(TABLE_NAME)
-            .update({ views_count: newViewsCount })
-            .eq('id', propertyId);
-
-        if (error) {
-            console.error('Error updating views count:', error);
-            return;
-        }
+        // Update in Firestore
+        await db.collection(COLLECTION_NAME).doc(propertyId).update({
+            views_count: newViewsCount
+        });
 
         // Update local state
         property.views_count = newViewsCount;
@@ -327,7 +315,7 @@ async function incrementViewsCount(propertyId) {
             }
         }
     } catch (error) {
-        console.error('Unexpected error in incrementViewsCount:', error);
+        console.error('Error updating views count:', error);
     }
 }
 
@@ -339,15 +327,10 @@ async function incrementClicksCount(propertyId) {
 
         const newClicksCount = (property.clicks_count || 0) + 1;
 
-        const { error } = await supabase
-            .from(TABLE_NAME)
-            .update({ clicks_count: newClicksCount })
-            .eq('id', propertyId);
-
-        if (error) {
-            console.error('Error updating clicks count:', error);
-            return;
-        }
+        // Update in Firestore
+        await db.collection(COLLECTION_NAME).doc(propertyId).update({
+            clicks_count: newClicksCount
+        });
 
         // Update local state
         property.clicks_count = newClicksCount;
@@ -361,14 +344,14 @@ async function incrementClicksCount(propertyId) {
             }
         }
     } catch (error) {
-        console.error('Unexpected error in incrementClicksCount:', error);
+        console.error('Error updating clicks count:', error);
     }
 }
 
 // ===== SETUP EVENT LISTENERS =====
 function setupEventListeners() {
     // Search functionality
-    searchInput.addEventListener('input', filterProperties);
+    searchInput.addEventListener('input', debounce(filterProperties, 300));
 
     // Filter functionality
     minPriceInput.addEventListener('change', filterProperties);
@@ -439,6 +422,3 @@ function debounce(func, delay) {
         }, delay);
     };
 }
-
-// Apply debounce to search for better performance
-searchInput.addEventListener('input', debounce(filterProperties, 300));

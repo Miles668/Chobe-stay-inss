@@ -1,8 +1,8 @@
 // ===== FIREBASE CONFIGURATION =====
 // Replace with YOUR Firebase config from Firebase Console
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
+  apiKey: "AIzaSyB19vm4vbVs_JA1xLCRzIPozgvy95DmZDI",
+  authDomain: "accolink-92e62.firebaseapp.com",
   projectId: "YOUR_PROJECT_ID",
   storageBucket: "YOUR_STORAGE_BUCKET",
   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",

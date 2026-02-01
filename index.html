@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accolink - Guest House Booking Platform</title>
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-home"></i>
+                <span>Accolink</span>
+            </div>
+            <div class="nav-search-wrapper">
+                <input 
+                    type="text" 
+                    id="property_search" 
+                    class="search-input" 
+                    placeholder="Search by name or location..."
+                >
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Favorites</a>
+                <a href="#" class="nav-link">My Bookings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Find Your Perfect Guest House</h1>
+            <p>Discover comfortable, affordable accommodations for your next getaway</p>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="filter-group">
+                <label for="min-price">Min Price:</label>
+                <input type="number" id="min-price" placeholder="0">
+            </div>
+            <div class="filter-group">
+                <label for="max-price">Max Price:</label>
+                <input type="number" id="max-price" placeholder="10000">
+            </div>
+            <div class="filter-group">
+                <label for="min-stars">Min Stars:</label>
+                <select id="min-stars">
+                    <option value="0">All</option>
+                    <option value="3">3★+</option>
+                    <option value="4">4★+</option>
+                    <option value="5">5★</option>
+                </select>
+            </div>
+            <button class="reset-btn" id="reset-filters">Reset Filters</button>
+        </div>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading properties...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+        <i class="fas fa-search"></i>
+        <h2>No Properties Found</h2>
+        <p>Try adjusting your search or filter criteria</p>
+    </div>
+
+    <!-- Properties Grid -->
+    <section class="properties-section">
+        <div class="properties-container" id="properties-grid">
+            <!-- Cards will be generated here by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Accolink. All rights reserved. | Premium Guest House Booking Platform</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,424 +1,113 @@
-// ===== FIREBASE CONFIGURATION =====
-// Replace with YOUR Firebase config from Firebase Console
-const firebaseConfig = {
-  apiKey: "AIzaSyB19vm4vbVs_JA1xLCRzIPozgvy95DmZDI",
-  authDomain: "accolink-92e62.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+// ===== DATA CENTER (Add New Guest Houses Here) =====
+const guestHouses = [
+    {
+        id: "pumpkinheads-01",
+        name: "Punkinheads Guesthouse",
+        location: "Kasane Plateau",
+        price: 800,
+        whatsapp: "26774938278",
+        stars: 4,
+        hearts: 124, // Initial heart count
+        images: [
+            "https://vmctxpfqlwqhcdwiqkpg.supabase.co/storage/v1/object/public/property-images/WhatsApp%20Image%202026-01-31%20at%2018.17.52%20(1).jpeg",
+            "https://vmctxpfqlwqhcdwiqkpg.supabase.co/storage/v1/object/public/property-images/15df0959-851e-4b0a-9d72-97a3a94aaf95.jpg",
+            "https://vmctxpfqlwqhcdwiqkpg.supabase.co/storage/v1/object/public/property-images/29213951-bfc1-41e9-8cdf-44361402b58b.jpg",
+            "https://vmctxpfqlwqhcdwiqkpg.supabase.co/storage/v1/object/public/property-images/cf27f7af-431e-4aa1-88a7-5e8e426a99d7.jpg"
+        ],
+        amenities: ["WiFi", "TV", "Breakfast", "Security"]
+    }
+    // To add more, put a comma here and paste another block
+];
+
+// ===== AMENITY ICONS =====
+const iconMap = {
+    "wifi": "fa-wifi",
+    "tv": "fa-tv",
+    "breakfast": "fa-coffee",
+    "security": "fa-shield-halved"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ===== DATABASE COLLECTION NAME =====
-const COLLECTION_NAME = 'guest_houses';
-
-// ===== STATE MANAGEMENT =====
-let allProperties = [];
-let filteredProperties = [];
-let swiperInstances = new Map();
-
-// ===== DOM ELEMENTS =====
-const propertiesGrid = document.getElementById('properties-grid');
-const searchInput = document.getElementById('property_search');
-const minPriceInput = document.getElementById('min-price');
-const maxPriceInput = document.getElementById('max-price');
-const minStarsSelect = document.getElementById('min-stars');
-const resetFiltersBtn = document.getElementById('reset-filters');
-const loadingSpinner = document.getElementById('loading-spinner');
-const emptyState = document.getElementById('empty-state');
-
-// ===== AMENITY ICONS MAPPING =====
-const amenityIconMap = {
-    'wifi': 'fas fa-wifi',
-    'pool': 'fas fa-water',
-    'ac': 'fas fa-snowflake',
-    'parking': 'fas fa-square-parking',
-    'kitchen': 'fas fa-kitchen-set',
-    'laundry': 'fas fa-shirt',
-    'tv': 'fas fa-tv',
-    'iron': 'fas fa-iron',
-    'microwave': 'fas fa-microwave',
-    'refrigerator': 'fas fa-snowflake',
-    'dishwasher': 'fas fa-water',
-    'heating': 'fas fa-temperature-high',
-    'balcony': 'fas fa-door-open',
-    'garden': 'fas fa-tree',
-    'gym': 'fas fa-dumbbell'
-};
-
-// ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadProperties();
-    setupEventListeners();
-});
-
-// ===== FETCH PROPERTIES FROM FIRESTORE =====
-async function loadProperties() {
-    try {
-        showLoadingSpinner(true);
+// ===== RENDER FUNCTION =====
+function displayGuestHouses(data) {
+    const grid = document.getElementById('properties-grid');
+    grid.innerHTML = data.map(house => {
         
-        const querySnapshot = await db.collection(COLLECTION_NAME).get();
+        const slides = house.images.map(img => `
+            <div class="swiper-slide"><img src="${img}" alt="${house.name}"></div>
+        `).join('');
 
-        if (querySnapshot.empty) {
-            console.warn('No properties found in Firestore');
-            showEmptyState(true);
-            return;
-        }
+        const amenitiesHTML = house.amenities.map(a => `
+            <div class="amenity-badge">
+                <i class="fas ${iconMap[a.toLowerCase()] || 'fa-check'}"></i>
+                <span>${a}</span>
+            </div>
+        `).join('');
 
-        // Convert Firestore documents to array
-        allProperties = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
-        filteredProperties = [...allProperties];
-        renderProperties();
-    } catch (error) {
-        console.error('Error loading properties:', error);
-        showEmptyState(true);
-    } finally {
-        showLoadingSpinner(false);
-    }
-}
-
-// ===== RENDER PROPERTY CARDS =====
-function renderProperties() {
-    if (filteredProperties.length === 0) {
-        showEmptyState(true);
-        propertiesGrid.innerHTML = '';
-        return;
-    }
-
-    showEmptyState(false);
-    propertiesGrid.innerHTML = '';
-
-    // Using .map() to generate HTML for each property
-    const cardsHTML = filteredProperties.map((property) => {
-        return createPropertyCard(property);
+        return `
+            <div class="property-card">
+                <div class="property-image-wrapper">
+                    <div class="rating-badge"><i class="fas fa-star"></i> ${house.stars}</div>
+                    <div class="heart-container" onclick="handleHeart('${house.id}')">
+                        <i class="far fa-heart" id="heart-icon-${house.id}"></i>
+                        <span id="heart-count-${house.id}">${house.hearts}</span>
+                    </div>
+                    <div class="swiper swiper-${house.id}">
+                        <div class="swiper-wrapper">${slides}</div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+                <div class="property-content">
+                    <h3 class="property-name">${house.name}</h3>
+                    <div class="property-location"><i class="fas fa-map-marker-alt"></i> ${house.location}</div>
+                    <div class="property-price">P${house.price} <span>/ night</span></div>
+                    <div class="amenities-list">${amenitiesHTML}</div>
+                    <button class="book-btn" onclick="bookNow('${house.name}', '${house.whatsapp}')">
+                        <i class="fab fa-whatsapp"></i> Book via WhatsApp
+                    </button>
+                </div>
+            </div>
+        `;
     }).join('');
 
-    propertiesGrid.innerHTML = cardsHTML;
-
-    // Initialize Swiper instances for each card
-    initializeSwipers();
-
-    // Attach event listeners to buttons
-    attachButtonListeners();
-}
-
-// ===== CREATE PROPERTY CARD HTML =====
-function createPropertyCard(property) {
-    const {
-        id,
-        name,
-        location,
-        price,
-        stars,
-        whatsapp,
-        images,
-        amenities,
-        views_count,
-        clicks_count
-    } = property;
-
-    // Safely parse images array
-    const imageArray = Array.isArray(images) ? images : [];
-    const imageCount = imageArray.length;
-
-    // Safely parse amenities array
-    const amenitiesArray = Array.isArray(amenities) ? amenities : [];
-
-    // Generate amenities HTML
-    const amenitiesHTML = amenitiesArray
-        .slice(0, 3)
-        .map((amenity) => {
-            const iconClass = amenityIconMap[amenity.toLowerCase()] || 'fas fa-check';
-            return `<div class="amenity-badge">
-                <i class="${iconClass}"></i>
-                <span>${amenity}</span>
-            </div>`;
-        })
-        .join('');
-
-    // Generate image slides HTML
-    const slidesHTML = imageArray
-        .map((imageUrl) => {
-            return `<div class="swiper-slide">
-                <img src="${imageUrl}" alt="${name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
-            </div>`;
-        })
-        .join('');
-
-    // Return the complete card HTML
-    return `
-        <div class="property-card" data-property-id="${id}" data-whatsapp="${whatsapp}" data-name="${name}">
-            <div class="property-image-wrapper">
-                <div class="rating-badge">
-                    <i class="fas fa-star"></i>
-                    <span>${stars || 0}</span>
-                </div>
-                
-                <div class="swiper property-swiper-${id}">
-                    <div class="swiper-wrapper">
-                        ${slidesHTML || `<div class="swiper-slide"><img src="https://via.placeholder.com/400x300?text=No+Image" alt="${name}"></div>`}
-                    </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                </div>
-
-                ${imageCount > 0 ? `<div class="image-count"><i class="fas fa-image"></i> ${imageCount}</div>` : ''}
-            </div>
-
-            <div class="property-content">
-                <div class="property-header">
-                    <h3 class="property-name">${name}</h3>
-                    <div class="property-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${location}</span>
-                    </div>
-                </div>
-
-                <div class="property-price">
-                    $${price}
-                    <span>/night</span>
-                </div>
-
-                <div class="amenities-list">
-                    ${amenitiesHTML}
-                </div>
-
-                <div class="card-stats">
-                    <div class="stat">
-                        <i class="fas fa-eye"></i>
-                        <span>${views_count || 0} views</span>
-                    </div>
-                    <div class="stat">
-                        <i class="fas fa-hand-pointer"></i>
-                        <span>${clicks_count || 0} interested</span>
-                    </div>
-                </div>
-
-                <button class="book-btn" data-property-id="${id}" data-whatsapp="${whatsapp}" data-name="${name}">
-                    <i class="fab fa-whatsapp"></i>
-                    Book Now
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-// ===== INITIALIZE SWIPERS FOR IMAGE GALLERY =====
-function initializeSwipers() {
-    filteredProperties.forEach((property) => {
-        const swiperContainer = document.querySelector(`.property-swiper-${property.id}`);
-        
-        if (swiperContainer && !swiperInstances.has(property.id)) {
-            const swiper = new Swiper(swiperContainer, {
-                loop: true,
-                autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false
-                },
-                pagination: {
-                    el: swiperContainer.querySelector('.swiper-pagination'),
-                    clickable: true
-                },
-                navigation: {
-                    nextEl: swiperContainer.querySelector('.swiper-button-next'),
-                    prevEl: swiperContainer.querySelector('.swiper-button-prev')
-                },
-                effect: 'fade',
-                fadeEffect: {
-                    crossFade: true
-                }
-            });
-
-            swiperInstances.set(property.id, swiper);
-        }
-    });
-}
-
-// ===== ATTACH BUTTON EVENT LISTENERS =====
-function attachButtonListeners() {
-    const bookButtons = document.querySelectorAll('.book-btn');
-    
-    bookButtons.forEach((button) => {
-        button.addEventListener('click', handleBookNowClick);
-    });
-
-    const cards = document.querySelectorAll('.property-card');
-    
-    cards.forEach((card) => {
-        card.addEventListener('mouseenter', () => {
-            incrementViewsCount(card.dataset.propertyId);
+    // Start Sliders
+    data.forEach(house => {
+        new Swiper(`.swiper-${house.id}`, {
+            pagination: { el: '.swiper-pagination', clickable: true },
+            loop: true
         });
     });
 }
 
-// ===== HANDLE BOOK NOW BUTTON CLICK =====
-async function handleBookNowClick(event) {
-    event.preventDefault();
+// ===== FUNCTIONALITY =====
+function bookNow(name, phone) {
+    const message = encodeURIComponent(`Hello! I saw your guest house "${name}" on Accolink. Any rooms available?`);
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+}
 
-    const propertyId = this.dataset.propertyId;
-    const whatsappNumber = this.dataset.whatsapp;
-    const propertyName = this.dataset.name;
+function handleHeart(id) {
+    const icon = document.getElementById(`heart-icon-${id}`);
+    const countEl = document.getElementById(`heart-count-${id}`);
+    let count = parseInt(countEl.innerText);
 
-    // Validate WhatsApp number
-    if (!whatsappNumber || whatsappNumber.trim() === '') {
-        console.error('WhatsApp number not available');
-        alert('WhatsApp contact not available for this property.');
-        return;
+    if (icon.classList.contains('far')) {
+        icon.classList.replace('far', 'fas');
+        icon.style.color = '#e11d48'; // Red heart
+        countEl.innerText = count + 1;
+    } else {
+        icon.classList.replace('fas', 'far');
+        icon.style.color = 'white';
+        countEl.innerText = count - 1;
     }
+}
 
-    // Track click analytics
-    await incrementClicksCount(propertyId);
-
-    // Create WhatsApp message with pre-filled text
-    const message = encodeURIComponent(
-        `Hello! I saw your guest house "${propertyName}" on Accolink.com. I'm interested in booking a room.`
+// Search Filter
+document.getElementById('property_search').addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    const filtered = guestHouses.filter(h => 
+        h.name.toLowerCase().includes(val) || h.location.toLowerCase().includes(val)
     );
+    displayGuestHouses(filtered);
+});
 
-    // Format WhatsApp link
-    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
-
-    // Open WhatsApp in new window
-    window.open(whatsappLink, '_blank', 'width=600,height=600');
-}
-
-// ===== ANALYTICS: INCREMENT VIEWS COUNT =====
-async function incrementViewsCount(propertyId) {
-    try {
-        const property = allProperties.find(p => p.id === propertyId);
-        if (!property) return;
-
-        const newViewsCount = (property.views_count || 0) + 1;
-
-        // Update in Firestore
-        await db.collection(COLLECTION_NAME).doc(propertyId).update({
-            views_count: newViewsCount
-        });
-
-        // Update local state
-        property.views_count = newViewsCount;
-
-        // Update UI
-        const card = document.querySelector(`[data-property-id="${propertyId}"]`);
-        if (card) {
-            const viewsStat = card.querySelector('.stat i.fa-eye').nextElementSibling;
-            if (viewsStat) {
-                viewsStat.textContent = `${newViewsCount} views`;
-            }
-        }
-    } catch (error) {
-        console.error('Error updating views count:', error);
-    }
-}
-
-// ===== ANALYTICS: INCREMENT CLICKS COUNT =====
-async function incrementClicksCount(propertyId) {
-    try {
-        const property = allProperties.find(p => p.id === propertyId);
-        if (!property) return;
-
-        const newClicksCount = (property.clicks_count || 0) + 1;
-
-        // Update in Firestore
-        await db.collection(COLLECTION_NAME).doc(propertyId).update({
-            clicks_count: newClicksCount
-        });
-
-        // Update local state
-        property.clicks_count = newClicksCount;
-
-        // Update UI
-        const card = document.querySelector(`[data-property-id="${propertyId}"]`);
-        if (card) {
-            const clicksStat = card.querySelector('.stat i.fa-hand-pointer').nextElementSibling;
-            if (clicksStat) {
-                clicksStat.textContent = `${newClicksCount} interested`;
-            }
-        }
-    } catch (error) {
-        console.error('Error updating clicks count:', error);
-    }
-}
-
-// ===== SETUP EVENT LISTENERS =====
-function setupEventListeners() {
-    // Search functionality
-    searchInput.addEventListener('input', debounce(filterProperties, 300));
-
-    // Filter functionality
-    minPriceInput.addEventListener('change', filterProperties);
-    maxPriceInput.addEventListener('change', filterProperties);
-    minStarsSelect.addEventListener('change', filterProperties);
-
-    // Reset filters
-    resetFiltersBtn.addEventListener('click', resetFilters);
-}
-
-// ===== FILTER PROPERTIES FUNCTION =====
-function filterProperties() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    const minPrice = parseInt(minPriceInput.value) || 0;
-    const maxPrice = parseInt(maxPriceInput.value) || Infinity;
-    const minStars = parseFloat(minStarsSelect.value) || 0;
-
-    filteredProperties = allProperties.filter((property) => {
-        const matchesSearch = 
-            property.name.toLowerCase().includes(searchTerm) ||
-            property.location.toLowerCase().includes(searchTerm);
-
-        const matchesPrice = property.price >= minPrice && property.price <= maxPrice;
-        const matchesStars = property.stars >= minStars;
-
-        return matchesSearch && matchesPrice && matchesStars;
-    });
-
-    renderProperties();
-}
-
-// ===== RESET FILTERS FUNCTION =====
-function resetFilters() {
-    searchInput.value = '';
-    minPriceInput.value = '';
-    maxPriceInput.value = '';
-    minStarsSelect.value = '0';
-
-    filteredProperties = [...allProperties];
-    renderProperties();
-}
-
-// ===== SHOW/HIDE LOADING SPINNER =====
-function showLoadingSpinner(show) {
-    if (show) {
-        loadingSpinner.style.display = 'flex';
-    } else {
-        loadingSpinner.style.display = 'none';
-    }
-}
-
-// ===== SHOW/HIDE EMPTY STATE =====
-function showEmptyState(show) {
-    if (show) {
-        emptyState.style.display = 'block';
-    } else {
-        emptyState.style.display = 'none';
-    }
-}
-
-// ===== DEBOUNCE FUNCTION FOR SEARCH =====
-function debounce(func, delay) {
-    let timeoutId;
-    return function (...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-}
+// Initial Load
+displayGuestHouses(guestHouses);

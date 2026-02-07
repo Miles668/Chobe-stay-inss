@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accolink – Home for Kasane-Chobe Guesthouses</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -14,6 +14,23 @@
     <p>Kasane-Chobe Guesthouses</p>
     <div class="search-bar">
       <input type="text" id="search" placeholder="🔍 Search guesthouses...">
+    </div>
+    <div class="quick-filters" aria-label="Quick filters">
+      <button class="filter-chip" data-filter="WiFi">WiFi</button>
+      <button class="filter-chip" data-filter="Swimming Pool">Pool</button>
+      <button class="filter-chip" data-filter="Breakfast">Breakfast</button>
+      <button class="filter-chip" data-filter="DStv">DStv</button>
+      <button class="filter-chip clear" data-filter="all">Clear</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-label">Available stays</span>
+        <span class="stat-value" id="stay-count">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Trending amenities</span>
+        <span class="stat-value" id="amenity-count">0</span>
+      </div>
     </div>
   </header>
 
@@ -44,7 +61,7 @@
       <div class="modal-details-section">
         <h2 id="modal-title"></h2>
         <p id="modal-location" class="location-text">
-          <i class="fas fa-map-marker-alt"></i> <span id="location-text"></span>
+          <i class="fas fa-map-marker-alt"></i> <span id="modal-location-text"></span>
         </p>
         <div class="divider"></div>
         <p id="modal-price" class="price-text"></p>
@@ -68,7 +85,7 @@
     </p>
   </footer>
 
-  <script src="guesthouses.js"></script>
+  <script src="guesthouse.js"></script>
   <script src="main.js"></script>
 </body>
-</html>
+index.html

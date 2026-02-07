@@ -1,16 +1,3 @@
-// ==================== Constants ====================
-const ITEMS_PER_PAGE = 10;
-const ITEMS_PER_ROW = 2;
-let currentPage = 1;
-let displayedCount = 0;
-let allGuesthouses = [];
-let filteredGuesthouses = [];
-let currentGuesthouse = null;
-let currentImgIndex = 0;
-let touchStartX = 0;
-let touchEndX = 0;
-let selectedRoom = null;
-
 // ==================== DOM Elements ====================
 const container = document.getElementById("guesthouse-container");
 const searchInput = document.getElementById("search");
@@ -25,6 +12,10 @@ const mPrice = document.getElementById("modal-price");
 const mAmenities = document.getElementById("modal-amenities");
 const mButtons = document.getElementById("modal-buttons");
 const swipeContainer = document.getElementById("swipe-container");
+const stayCount = document.getElementById("stay-count");
+const amenityCount = document.getElementById("amenity-count");
+const filterChips = document.querySelectorAll(".filter-chip");
+const modalLocationText = document.getElementById("modal-location-text");
 
 // ==================== Amenity Icons ====================
 const amenityIcons = {
@@ -51,6 +42,8 @@ window.addEventListener('load', () => {
     allGuesthouses = [...guesthouses];
     filteredGuesthouses = [...guesthouses];
     loadFavoritesFromStorage();
+    bindQuickFilters();
+    updateStats();
     renderInitialGuesthouses();
     updateViewMoreButton();
   } else {
@@ -85,9 +78,10 @@ function createGuestCard(g) {
   
   const isFavorited = localStorage.getItem(`fav-${g.id}`) === 'true';
   const favoriteCount = localStorage.getItem(`fav-count-${g.id}`) || '0';
+  const fallbackImage = getFallbackImage(g.name);
 
   card.innerHTML = `
-    <img src="${g.images[0]}" alt="${g.name}" loading="lazy">
+    <img src="${g.images[0]}" alt="${g.name}" loading="lazy" onerror="handleImageError(this, '${fallbackImage}')">
     <div class="card-body">
       <div class="card-header">
         <h3>${g.name}</h3>
@@ -97,7 +91,7 @@ function createGuestCard(g) {
       </div>
       <div class="location-info">
         ${locationIcon}
-        <span id="location-text">${g.location}</span>
+        <span class="location-text">${g.location}</span>
       </div>
       <div class="favorite-count ${favoriteCount > 0 ? 'show' : ''}" id="fav-count-${g.id}">
         ❤️ ${favoriteCount} people favorited
@@ -127,7 +121,7 @@ function openFullModal(id) {
 
   // Populate Details
   mTitle.textContent = currentGuesthouse.name;
-  document.getElementById('location-text').textContent = currentGuesthouse.location;
+  modalLocationText.textContent = currentGuesthouse.location;
   
   const roomPrice = currentGuesthouse.rooms[0] ? currentGuesthouse.rooms[0].price : "N/A";
   mPrice.textContent = `Starting from P ${roomPrice} / night`;
@@ -215,7 +209,8 @@ function proceedToBooking() {
 // ==================== Image Slider with Swipe ====================
 function updateSlider() {
   const images = currentGuesthouse.images;
-  slider.innerHTML = `<img src="${images[currentImgIndex]}" />`;
+  const fallbackImage = getFallbackImage(currentGuesthouse.name);
+  slider.innerHTML = `<img src="${images[currentImgIndex]}" onerror="handleImageError(this, '${fallbackImage}')" />`;
   countDisplay.textContent = `${currentImgIndex + 1} / ${images.length}`;
 }
 
@@ -300,19 +295,7 @@ function loadFavoritesFromStorage() {
 
 // ==================== Search Filter ====================
 searchInput.addEventListener("input", e => {
-  const term = e.target.value.toLowerCase();
-  
-  if (term === "") {
-    filteredGuesthouses = [...allGuesthouses];
-  } else {
-    filteredGuesthouses = allGuesthouses.filter(g =>
-      g.name.toLowerCase().includes(term) ||
-      g.location.toLowerCase().includes(term) ||
-      g.amenities.some(a => a.toLowerCase().includes(term))
-    );
-  }
-
-  renderInitialGuesthouses();
+  applyFilters();
 });
 
 // ==================== View More Button ====================
@@ -323,3 +306,62 @@ viewMoreBtn.addEventListener('click', () => {
     container.lastChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 100);
 });
+
+function bindQuickFilters() {
+  filterChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      const filter = chip.dataset.filter;
+      if (filter === "all") {
+        filterChips.forEach(btn => btn.classList.remove("active"));
+      } else {
+        chip.classList.toggle("active");
+        document.querySelector('.filter-chip.clear')?.classList.remove("active");
+      }
+      applyFilters();
+    });
+  });
+}
+
+function applyFilters() {
+  const term = searchInput.value.toLowerCase();
+  const activeFilters = [...filterChips]
+    .filter(chip => chip.classList.contains("active"))
+    .map(chip => chip.dataset.filter);
+
+  filteredGuesthouses = allGuesthouses.filter(g => {
+    const matchesSearch = term === "" || (
+      g.name.toLowerCase().includes(term) ||
+      g.location.toLowerCase().includes(term) ||
+      g.amenities.some(a => a.toLowerCase().includes(term))
+    );
+
+    const matchesFilter = activeFilters.length === 0 || activeFilters.every(filter =>
+      g.amenities.includes(filter)
+    );
+
+    return matchesSearch && matchesFilter;
+  });
+
+  updateStats();
+  renderInitialGuesthouses();
+}
+
+function updateStats() {
+  if (!stayCount || !amenityCount) return;
+  stayCount.textContent = filteredGuesthouses.length.toString();
+  const amenitySet = new Set();
+  filteredGuesthouses.forEach(g => g.amenities.forEach(a => amenitySet.add(a)));
+  amenityCount.textContent = amenitySet.size.toString();
+}
+
+function getFallbackImage(name) {
+  return `https://placehold.co/800x600/1A4D2E/FFFFFF?text=${encodeURIComponent(name)}`;
+}
+
+function handleImageError(img, fallbackSrc) {
+  if (img.dataset.fallbackLoaded) return;
+  img.src = fallbackSrc;
+  img.dataset.fallbackLoaded = "true";
+  img.classList.add("image-fallback");
+}
+main.js

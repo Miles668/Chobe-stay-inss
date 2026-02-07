@@ -1,38 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accolink | Chobe Stays</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accolink – Home for Kasane-Chobe Guesthouses</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">ACCOLINK</div>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="property_search" placeholder="Search Kasane Plateau...">
-            </div>
-        </div>
-    </nav>
+  <header>
+    <h1>✨ Accolink</h1>
+    <p>Kasane-Chobe Guesthouses</p>
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="🔍 Search guesthouses...">
+    </div>
+  </header>
 
-    <header class="hero">
-        <h1>Find Your Perfect Stay</h1>
-        <p>Comfortable guest houses in Botswana</p>
-    </header>
+  <main>
+    <div id="guesthouse-container"></div>
+    <button id="view-more-btn" class="view-more-btn">View More Guesthouses</button>
+  </main>
 
-    <main id="properties-grid" class="grid-container">
-        </main>
+  <!-- Room Selection Modal -->
+  <div id="room-modal" class="modal room-modal">
+    <div class="modal-wrapper room-modal-wrapper">
+      <span class="close" onclick="closeRoomModal()">&times;</span>
+      <h2>Select Your Room</h2>
+      <div id="room-options" class="room-options"></div>
+    </div>
+  </div>
 
-    <footer class="footer">
-        <p>&copy; 2026 Accolink. All rights reserved.</p>
-    </footer>
+  <!-- Photo Modal (Enhanced with Swipe) -->
+  <div id="photo-modal" class="modal photo-modal">
+    <div class="modal-wrapper photo-modal-wrapper">
+      <span class="close" onclick="closePhotoModal()">&times;</span>
+      
+      <div class="modal-slider-section" id="swipe-container">
+        <div id="modal-slider"></div>
+        <div id="photo-count" class="photo-count"></div>
+      </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="app.js"></script>
+      <div class="modal-details-section">
+        <h2 id="modal-title"></h2>
+        <p id="modal-location" class="location-text">
+          <i class="fas fa-map-marker-alt"></i> <span id="location-text"></span>
+        </p>
+        <div class="divider"></div>
+        <p id="modal-price" class="price-text"></p>
+        
+        <h4>Amenities:</h4>
+        <div id="modal-amenities" class="amenities-list"></div>
+
+        <div id="modal-buttons" class="action-buttons"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Connect with us: 
+      <a href="https://www.facebook.com/profile.php?id=61587234453360" target="_blank">
+        <i class="fab fa-facebook"></i> Facebook
+      </a> | 
+      <a href="mailto:accolink527@gmail.com">
+        <i class="fas fa-envelope"></i> Email
+      </a>
+    </p>
+  </footer>
+
+  <script src="guesthouses.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

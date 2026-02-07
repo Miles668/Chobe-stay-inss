@@ -1,289 +1,108 @@
-diff --git a/styles.css b/styles.css
-index 5f35b62c35e0e44d1868093bf02954c2ab2bd8d2..8badc071c1529f5050327d4e89343bdcb4440d14 100644
---- a/styles.css
-+++ b/styles.css
-@@ -47,50 +47,114 @@ header {
-     transform: translateY(0);
-   }
- }
- 
- header h1 {
-   margin: 0;
-   font-size: 36px;
-   letter-spacing: 2px;
-   font-weight: 700;
-   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
- }
- 
- header p {
-   opacity: 0.9;
-   margin-bottom: 20px;
-   font-size: 15px;
-   letter-spacing: 0.5px;
- }
- 
- .search-bar {
-   display: flex;
-   justify-content: center;
-   gap: 10px;
- }
- 
-+.quick-filters {
-+  margin-top: 15px;
-+  display: flex;
-+  flex-wrap: wrap;
-+  gap: 10px;
-+  justify-content: center;
-+}
-+
-+.filter-chip {
-+  border: 1px solid rgba(255, 255, 255, 0.5);
-+  background: rgba(255, 255, 255, 0.15);
-+  color: #fff;
-+  padding: 8px 14px;
-+  border-radius: 999px;
-+  cursor: pointer;
-+  font-size: 13px;
-+  transition: all 0.3s ease;
-+}
-+
-+.filter-chip:hover {
-+  transform: translateY(-1px);
-+  background: rgba(255, 255, 255, 0.25);
-+}
-+
-+.filter-chip.active {
-+  background: #fff;
-+  color: var(--primary-green);
-+  font-weight: 600;
-+}
-+
-+.filter-chip.clear {
-+  border-style: dashed;
-+}
-+
-+.stats-row {
-+  margin-top: 18px;
-+  display: flex;
-+  justify-content: center;
-+  gap: 16px;
-+  flex-wrap: wrap;
-+}
-+
-+.stat-card {
-+  background: rgba(255, 255, 255, 0.12);
-+  border: 1px solid rgba(255, 255, 255, 0.25);
-+  padding: 12px 18px;
-+  border-radius: 14px;
-+  min-width: 150px;
-+  text-align: center;
-+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-+}
-+
-+.stat-label {
-+  font-size: 12px;
-+  display: block;
-+  opacity: 0.85;
-+  margin-bottom: 4px;
-+}
-+
-+.stat-value {
-+  font-size: 20px;
-+  font-weight: 700;
-+}
-+
- .search-bar input {
-   padding: 14px 20px;
-   width: 90%;
-   max-width: 450px;
-   border: none;
-   border-radius: 30px;
-   outline: none;
-   background: rgba(255, 255, 255, 0.95);
-   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-   font-size: 15px;
-   transition: all 0.3s ease;
- }
- 
- .search-bar input:focus {
-   transform: translateY(-2px);
-   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-   background: white;
- }
- 
- .search-bar input::placeholder {
-   color: #999;
- }
- 
- /* --- Main Container --- */
- main {
-@@ -139,50 +203,55 @@ main {
- }
- 
- @keyframes fadeInUp {
-   from {
-     opacity: 0;
-     transform: translateY(30px);
-   }
-   to {
-     opacity: 1;
-     transform: translateY(0);
-   }
- }
- 
- .card:hover {
-   transform: translateY(-10px) rotateX(5deg);
-   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
- }
- 
- .card img {
-   width: 100%;
-   height: 180px;
-   object-fit: cover;
-   transition: transform 0.4s ease;
- }
- 
-+.card img.image-fallback {
-+  object-fit: cover;
-+  filter: saturate(0.9);
-+}
-+
- .card:hover img {
-   transform: scale(1.08);
- }
- 
- .card-body {
-   padding: 18px;
-   display: flex;
-   flex-direction: column;
-   flex-grow: 1;
- }
- 
- .card-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: start;
-   margin-bottom: 10px;
-   gap: 10px;
- }
- 
- .card h3 {
-   font-size: 17px;
-   color: var(--primary-green);
-   margin: 0;
-   font-weight: 700;
-   flex: 1;
-@@ -367,50 +436,54 @@ main {
-   position: relative;
-   min-height: 300px;
-   flex: 1.5;
-   touch-action: pan-y;
-   overflow: hidden;
- }
- 
- #modal-slider {
-   width: 100%;
-   height: 100%;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   position: relative;
- }
- 
- #modal-slider img {
-   width: 100%;
-   height: 100%;
-   max-height: 500px;
-   object-fit: contain;
-   display: block;
-   animation: fadeInImage 0.4s ease;
- }
- 
-+#modal-slider img.image-fallback {
-+  object-fit: cover;
-+}
-+
- @keyframes fadeInImage {
-   from {
-     opacity: 0;
-   }
-   to {
-     opacity: 1;
-   }
- }
- 
- .photo-count {
-   position: absolute;
-   bottom: 15px;
-   right: 20px;
-   background: rgba(0, 0, 0, 0.6);
-   color: white;
-   padding: 6px 12px;
-   border-radius: 15px;
-   font-size: 12px;
-   backdrop-filter: blur(5px);
- }
- 
- /* Room Modal */
- .room-modal-wrapper {
-   max-width: 500px;
- }
-@@ -693,50 +766,58 @@ footer i {
-   }
- 
-   .modal-slider-section {
-     min-height: 250px;
-   }
- 
-   .modal-details-section {
-     padding: 20px;
-   }
- }
- 
- @media (max-width: 480px) {
-   header h1 {
-     font-size: 24px;
-   }
- 
-   header p {
-     font-size: 13px;
-   }
- 
-   .search-bar input {
-     max-width: 100%;
-     padding: 12px 16px;
-   }
- 
-+  .quick-filters {
-+    gap: 8px;
-+  }
-+
-+  .filter-chip {
-+    font-size: 12px;
-+  }
-+
-   #guesthouse-container {
-     grid-template-columns: 1fr;
-     gap: 12px;
-   }
- 
-   .modal-wrapper {
-     border-radius: 12px;
-   }
- 
-   .card h3 {
-     font-size: 15px;
-   }
- 
-   #modal-title {
-     font-size: 20px;
-   }
- 
-   .action-buttons {
-     gap: 10px;
-   }
- 
-   .btn-book, .btn-call {
-     padding: 12px;
-     font-size: 14px;
-   }
+:root {
+  --dark-green: #1A4D2E;
+  --brown: #8B5A2B;
+  --cream: #fdfaf6;
+  --text: #333;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+body { background-color: #f4f1ea; color: var(--text); }
+
+header {
+  background-color: var(--dark-green);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+header input {
+  margin-top: 15px;
+  padding: 12px;
+  width: 90%;
+  max-width: 450px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+}
+
+/* Grid */
+#guesthouse-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px;
+  padding: 15px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (min-width: 992px) {
+  #guesthouse-container { grid-template-columns: repeat(4, 1fr); gap: 25px; }
+}
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column;
+}
+.card img { width: 100%; height: 160px; object-fit: cover; }
+.card-body { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+.card h3 { font-size: 16px; margin-bottom: 5px; color: var(--dark-green); }
+.card .loc { font-size: 13px; color: #777; margin-bottom: 10px; display: flex; align-items: center; }
+
+.explore-btn {
+  margin-top: auto;
+  background: var(--brown);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Room List in Modal */
+.room-list {
+  display: flex; flex-direction: column; gap: 10px; margin: 15px 0;
+  border-top: 1px solid #eee; padding-top: 15px;
+}
+.room-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #ddd;
+}
+.room-info h4 { margin: 0; font-size: 14px; color: #333; }
+.room-info span { font-size: 12px; color: #666; }
+
+.btn-room-book {
+  background: var(--dark-green); color: white; text-decoration: none;
+  padding: 8px 15px; border-radius: 6px; font-size: 12px; font-weight: bold;
+}
+
+/* Modal Structure */
+.modal {
+  display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 10px;
+}
+.modal-wrapper {
+  background: white; width: 100%; max-width: 850px; display: flex; flex-direction: column;
+  border-radius: 15px; overflow: hidden; max-height: 90vh; position: relative;
+}
+@media (min-width: 768px) { .modal-wrapper { flex-direction: row; } }
+
+.modal-slider-section { flex: 1.5; background: #000; display: flex; flex-direction: column; }
+#modal-slider img { width: 100%; height: 300px; object-fit: contain; }
+@media (min-width: 768px) { #modal-slider img { height: 450px; } }
+
+.slider-controls { display: flex; justify-content: space-between; padding: 10px; background: #222; }
+.slider-controls button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+#photo-count { color: white; font-size: 14px; margin-top: 5px; }
+
+.modal-details-section { flex: 1; padding: 25px; overflow-y: auto; }
+.amenities-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+.amenities-list span { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+
+.btn-call { display: block; border: 2px solid var(--dark-green); color: var(--dark-green); text-decoration: none; padding: 12px; text-align: center; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+.close { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10; color: #333; }
+#load-more-container { text-align: center; padding: 20px; }
+#load-more-btn { background: var(--dark-green); color: white; padding: 12px 30px; border: none; border-radius: 25px; cursor: pointer; }

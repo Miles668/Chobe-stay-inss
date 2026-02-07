@@ -3,25 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accolink – Home for Kasane-Chobe Guesthouses</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <title>Accolink – Kasane-Chobe Guesthouses</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header>
-    <h1>✨ Accolink</h1>
+    <h1>Accolink</h1>
     <p>Kasane-Chobe Guesthouses</p>
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="🔍 Search guesthouses...">
+    <div class="search-wrapper">
+      <input type="text" id="search" placeholder="Search by name or location...">
     </div>
-    <div class="quick-filters" aria-label="Quick filters">
-      <button class="filter-chip" data-filter="WiFi">WiFi</button>
-      <button class="filter-chip" data-filter="Swimming Pool">Pool</button>
-      <button class="filter-chip" data-filter="Breakfast">Breakfast</button>
-      <button class="filter-chip" data-filter="DStv">DStv</button>
-      <button class="filter-chip clear" data-filter="all">Clear</button>
+  </header>
+
+  <main>
+    <div id="guesthouse-container"></div>
+    <div id="load-more-container">
+      <button id="load-more-btn">See More Guesthouses</button>
     </div>
+  </main>
+
+  <div id="photo-modal" class="modal">
+    <div class="modal-wrapper">
+      <span class="close">&times;</span>
+      
+      <div class="modal-slider-section">
+        <div id="modal-slider"></div>
+        <div class="slider-controls">
+          <button id="prevBtn">&#10094;</button>
+          <div id="photo-count"></div>
+          <button id="nextBtn">&#10095;</button>
+        </div>
+      </div>
+
+      <div class="modal-details-section">
+        <h2 id="modal-title"></h2>
+        <p id="modal-location"></p>
+        <div class="divider"></div>
+        
+        <h4>Amenities:</h4>
+        <div id="modal-amenities" class="amenities-list"></div>
+
+        <div id="modal-buttons" class="action-buttons"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Accolink. <a href="#">Facebook</a></p>
+  </footer>
+
+  <script src="guesthouses.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-label">Available stays</span>
